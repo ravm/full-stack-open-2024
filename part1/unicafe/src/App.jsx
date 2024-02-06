@@ -14,29 +14,32 @@ const Statistics = ({good, neutral, bad, avg}) => {
 
   if (total === 0) {
     return (
-      <div>
-        No feedback given
-      </div>
+      <tr>
+        <td>
+          No feedback given
+        </td>
+      </tr>
     )
   }
 
   return (
-    <div>
+    <tbody>
       <StatisticsLine text="good" value={good} />
       <StatisticsLine text="neutral" value={neutral} />
       <StatisticsLine text="bad" value={bad} />
       <StatisticsLine text="all" value={total} />
       <StatisticsLine text="average" value={total > 0 ? avg / total : 0} />
       <StatisticsLine text="positive" value={total > 0 ? totalGood : 0} />
-    </div>
+    </tbody>
   )
 }
 
 const StatisticsLine = ({text, value}) => {
   return (
-    <p>
-      {text} {text === "positive" ? `${value} %` : value}
-    </p>
+    <tr style={{ textAlign: 'left' }}>
+      <td>{text}</td>
+      <td>{text === "positive" ? `${value} %` : value}</td>
+    </tr>
   )
 }
 
@@ -69,7 +72,9 @@ const App = () => {
       <Button handleClick={handleNeutral} text={'neutral'} />
       <Button handleClick={handleBad} text={'bad'} />
       <h1>statistics</h1>
-      <Statistics good={good} neutral={neutral} bad={bad} avg={avg}/>
+      <table>
+        <Statistics good={good} neutral={neutral} bad={bad} avg={avg}/>
+      </table>
     </div>
   )
 }
