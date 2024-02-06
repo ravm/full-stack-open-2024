@@ -1,1 +1,1 @@
-Full Stack Open Course Exercises
+Full Stack Open 2024 Course Exercises
