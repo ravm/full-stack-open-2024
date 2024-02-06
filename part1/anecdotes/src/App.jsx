@@ -21,6 +21,7 @@ const App = () => {
   ]
    
   const [selected, setSelected] = useState(0)
+  const [count, setCount] = useState(0)
 
   const RandomQuote = () => {
     let index = Math.floor(Math.random() * anecdotes.length)
@@ -33,6 +34,7 @@ const App = () => {
       <div>
         {anecdotes[selected]}
       </div>
+      <Button handleClick={setCount} text={"vote"}></Button>
       <Button handleClick={RandomQuote} text={"next anecdote"} />
     </div>
   )
