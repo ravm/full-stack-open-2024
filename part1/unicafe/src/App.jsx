@@ -8,12 +8,27 @@ const Button = ({ handleClick, text }) => {
   )
 }
 
-const FeedbackCounter = props => {
+const FeedBackCalculator = props => {
+  const scoreRatio = {
+    good: 1,
+    neutral: 0,
+    bad: -1
+  }
+
+  let average = scoreRatio.good + scoreRatio.neutral + scoreRatio.bad
+
+  return average
+
+}
+
+const FeedbackCounter = ({good, neutral, bad}) => {
   return (
     <div>
-      <p>good {props.good}</p>
-      <p>neutral {props.neutral}</p>
-      <p>bad {props.bad}</p>
+      <p>good {good}</p>
+      <p>neutral {neutral}</p>
+      <p>bad {bad}</p>
+      <p>all {good + neutral + bad}</p>
+      <p>average {FeedBackCalculator(good, neutral, bad)} </p>
     </div>
   )
 }
