@@ -14,11 +14,13 @@ const Statistics = ({good, neutral, bad, avg}) => {
 
   if (total === 0) {
     return (
-      <tr>
-        <td>
-          No feedback given
-        </td>
-      </tr>
+      <tbody>
+        <tr>
+          <td>
+            No feedback given
+          </td>
+        </tr>
+      </tbody>
     )
   }
 
