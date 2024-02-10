@@ -8,8 +8,10 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault();
+    if (nameChecker()) {
+      return;
+    }
     setPersons(persons.concat({name: newName}));
-    nameChecker();
     setNewName('');
   }
 
@@ -21,6 +23,7 @@ const App = () => {
     const nameExists = persons.find(person => person.name === newName);
     if (nameExists) {
       alert(`${newName} is already added to phonebook`);
+      return true
     }
   }
 
@@ -29,10 +32,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <form>
         <div>
-          name: <input 
-                  value={newName}
-                  onChange={handleNameChange}
-                />
+          name: <input value={newName} onChange={handleNameChange} />
         </div>
         <div>
           <button onClick={addName} type="submit">add</button>
