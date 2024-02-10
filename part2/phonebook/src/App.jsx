@@ -44,14 +44,17 @@ const App = () => {
       return true
     }
   }
-
-  return (
-    <div>
-      <h2>Phonebook</h2>
+  
+  const FilterNames = ({ filter, handleFilterChange }) => {
+    return (
       <div>
         filter shown with <input value={filter} onChange={handleFilterChange} />
       </div>
-      <h2>add a new</h2>
+    )
+  }
+
+  const PersonForm = ({ newName, handleNameChange, newNumber, handleNumberChange, addData }) => {
+    return (
       <form>
         <div>
           name: <input value={newName} onChange={handleNameChange} />
@@ -63,9 +66,35 @@ const App = () => {
           <button onClick={addData} type="submit">add</button>
         </div>
       </form>
-      <h2>Numbers</h2>
-      {persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()) || filter === '')
+    )
+  }
+
+  const Persons = ({ persons }) => {
+    return (
+      <div>
+        {persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()) || filter === '')
         .map(person => <p key={person.id}>{person.name} {person.number}</p>)}
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <h2>Phonebook</h2>
+      
+      <FilterNames filter={filter} handleFilterChange={handleFilterChange}/>
+
+      <h3>add a new</h3>
+      <PersonForm
+        newName={newName}
+        handleNameChange={handleNameChange}
+        newNumber={newNumber}
+        handleNumberChange={handleNumberChange}
+        addData={addData}
+      />
+
+      <h3>Numbers</h3>
+      <Persons persons={persons}/>
     </div>
   )
 }
