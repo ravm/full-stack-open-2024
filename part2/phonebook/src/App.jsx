@@ -47,6 +47,9 @@ const App = () => {
       .then(initialPersons => {
         setPersons(initialPersons)
       })
+      .catch(error => {
+        console.log(`Error fetching persons: ${error}`)
+      })
   }, [])
 
   const addData = (event) => {
@@ -65,6 +68,9 @@ const App = () => {
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson));
             setNewName('');
             setNewNumber('');
+          })
+          .catch(error => {
+            console.log(`Error updating person: ${error}`)
           })
 
         return;
@@ -89,6 +95,9 @@ const App = () => {
         setNewName('');
         setNewNumber('');
       })
+      .catch(error => {
+        console.log(`Error creating person: ${error}`)
+      })
   }
 
   const deletePerson = person  => {
@@ -97,6 +106,9 @@ const App = () => {
       .remove(person.id)
       .then(() => {
         setPersons(persons.filter(p => p.id !== person.id))
+      })
+      .catch(error => {
+        console.log(`Error deleting person: ${error}`)
       })
     } 
   }
