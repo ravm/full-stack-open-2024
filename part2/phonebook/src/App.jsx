@@ -29,7 +29,8 @@ const Persons = ({ persons, filter, deletePerson }) => {
   return (
     <div>
       {persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()) || filter === '')
-      .map(person => <p key={person.id}>{person.name} {person.number} <button key={person.id} onClick={() => deletePerson(person)}>delete</button></p>)}
+      .map(person => <p key={person.id}>{person.name} {person.number} <button key={person.id}
+      onClick={() => deletePerson(person)}>delete</button></p>)}
     </div>
   )
 }
@@ -50,7 +51,29 @@ const App = () => {
 
   const addData = (event) => {
     event.preventDefault();
-    if (dataChecker()) {
+    const nameExists = persons.find(person => person.name === newName);
+    const numberExists = persons.find(person => person.number === newNumber);
+
+    if (nameExists) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const existingPerson = persons.find(person => person.name === newName);
+        const updatedPerson = {...existingPerson, number: newNumber};
+
+        personService
+          .update(existingPerson.id, updatedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson));
+            setNewName('');
+            setNewNumber('');
+          })
+
+        return;
+      } else {
+        return;
+      }
+      
+    } else if (numberExists) {
+      alert(`${newNumber} is already added to phonebook`);
       return;
     }
 
@@ -72,7 +95,7 @@ const App = () => {
     if (window.confirm(`Delete ${person.name}?`)) {
       personService
       .remove(person.id)
-      .then(returnedPerson => {
+      .then(() => {
         setPersons(persons.filter(p => p.id !== person.id))
       })
     } 
@@ -88,18 +111,6 @@ const App = () => {
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
-  }
-
-  const dataChecker = () => {
-    const nameExists = persons.find(person => person.name === newName);
-    const numberExists = persons.find(person => person.number === newNumber);
-    if (nameExists) {
-      alert(`${newName} is already added to phonebook`);
-      return true
-    } else if (numberExists) {
-      alert(`${newNumber} is already added to phonebook`);
-      return true
-    }
   }
 
   return (

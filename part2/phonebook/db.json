@@ -1,3 +1,24 @@
 {
-  "persons": []
+  "persons": [
+    {
+      "id": "f1aa",
+      "name": "Arto Hellas",
+      "number": "040-123456"
+    },
+    {
+      "id": "853b",
+      "name": "Ada Lovelace",
+      "number": "39-44-5323523"
+    },
+    {
+      "id": "a9b9",
+      "name": "Jaakko",
+      "number": "123456789"
+    },
+    {
+      "id": "24c2",
+      "name": "Miika Ravi",
+      "number": "0417873173"
+    }
+  ]
 }
