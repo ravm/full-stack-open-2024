@@ -41,12 +41,10 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    console.log('effect')
     personService
       .getAll()
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
 
@@ -58,17 +56,26 @@ const App = () => {
 
     const personObject = {
       name: newName,
-      number: newNumber,
-      id: persons.length + 1
+      number: newNumber
     }
     
     personService
       .create(personObject)
-      .then(response => {
-        setPersons(persons.concat(response.data))
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
         setNewName('');
         setNewNumber('');
       })
+  }
+
+  const deletePerson = person  => {
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personService
+      .remove(person.id)
+      .then(returnedPerson => {
+        setPersons(persons.filter(p => p.id !== person.id))
+      })
+    } 
   }
 
   const handleNameChange = (event) => {
@@ -93,17 +100,6 @@ const App = () => {
       alert(`${newNumber} is already added to phonebook`);
       return true
     }
-  }
-
-  const deletePerson = person  => {
-    if (window.confirm(`Delete ${person.name}?`)) {
-      personService
-        .remove(person.id)
-        .then(response => {
-          console.log(response.data)
-          setPersons(persons.filter(p => p.id !== person.id))
-        })
-    } 
   }
 
   return (
