@@ -55,9 +55,20 @@ const App = () => {
     if (dataChecker()) {
       return;
     }
-    setPersons(persons.concat({name: newName, number: newNumber, id: persons.length + 1}));
-    setNewName('');
-    setNewNumber('');
+
+    const personObject = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1
+    }
+    
+    axios
+      .post('http://localhost:3001/persons', personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName('');
+        setNewNumber('');
+      })
   }
 
   const handleNameChange = (event) => {
