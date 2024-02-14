@@ -3,16 +3,41 @@ import countryService from './services/countries'
 
 const Countries = ({ countries, filter }) => {
   const filteredCountries = countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()) || filter === '')
+  const queriedCountries = filteredCountries.map(country => <p key={country.cca3}>{country.name.common}</p>)
 
   if (filteredCountries.length > 10) {
     return <p>Too many matches, specify another filter</p>
-  }
+  } else if (filteredCountries.length > 1) {
+    return (
+      <div>
+        {queriedCountries}
+      </div>
+    )
+  } else if (filteredCountries.length === 1) {
+      const country = filteredCountries[0];
+      const countryInfo = (
+        <div>
+          <h1>{country.name.common}</h1>
+          <p>capital {country.capital}</p>
+          <p>area {country.area}</p>
+          <strong>languages:</strong>
+          <ul>
+            {Object.keys(country.languages).map((lang, i) => (
+              <li key={i}>{country.languages[lang]}</li>
+            ))}
+          </ul>
+          <picture>
+            <img src={country.flags.svg} width={150} />
+          </picture>
+        </div>
+      )
 
-  return (
-    <div>
-      {filteredCountries.map(country => <p key={country.cca3}>{country.name.common}</p>)}
-    </div>
-  )
+    return (
+      <div>
+        {countryInfo}
+      </div>
+    )
+  }
 }
 
 const FilterCountries = ({ filter, handleFilterChange }) => {
