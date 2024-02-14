@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
+import './index.css'
 
 const FilterNames = ({ filter, handleFilterChange }) => {
   return (
@@ -40,6 +41,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [successMessage, setSuccessMessage] = useState('Success!')
 
   useEffect(() => {
     personService
@@ -68,6 +70,10 @@ const App = () => {
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson));
             setNewName('');
             setNewNumber('');
+            setSuccessMessage(`Updated ${updatedPerson.name}`)
+            setTimeout(() => {
+            setSuccessMessage(null)
+          }, 3000)
           })
           .catch(error => {
             console.log(`Error updating person: ${error}`)
@@ -94,6 +100,10 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('');
         setNewNumber('');
+        setSuccessMessage(`Added ${personObject.name}`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 3000)
       })
       .catch(error => {
         console.log(`Error creating person: ${error}`)
@@ -125,9 +135,21 @@ const App = () => {
     setFilter(event.target.value);
   }
 
+  const Notification = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+    return (
+      <div className='success'>
+        {message}
+      </div>
+    )
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage} />
       
       <FilterNames filter={filter} handleFilterChange={handleFilterChange}/>
 
