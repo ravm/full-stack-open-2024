@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
 import countryService from './services/countries'
 
-const Countries = ({ countries, filter, DisplayCountry }) => {
+const Countries = ({ countries, filter, handleSelectedCountry, selectedCountry }) => {
+  if (selectedCountry) {
+    return null
+  }
+
   const filteredCountries = countries.filter(country => country.name.common.toLowerCase()
   .includes(filter.toLowerCase()) || filter === '')
 
   const queriedCountries = filteredCountries.map(country => <p key={country.cca3}>
-  {country.name.common} <button key={country.cca3} onClick={() => DisplayCountry(country)}>show</button></p>)
+  {country.name.common} <button key={country.cca3} onClick={() => handleSelectedCountry(country)}>show</button></p>)
 
   if (filteredCountries.length > 10) {
     return <p>Too many matches, specify another filter</p>
@@ -20,14 +24,13 @@ const Countries = ({ countries, filter, DisplayCountry }) => {
     const country = filteredCountries[0];
     return (
       <div>
-        {DisplayCountry(country)}
+        <DisplayCountry country={country} />
       </div>
     )
   }
 }
 
-const DisplayCountry = country => {
-  console.log(country.name.common)
+const DisplayCountry = ({ country }) => {
   return (
     <div>
       <h1>{country.name.common}</h1>
@@ -57,6 +60,7 @@ const FilterCountries = ({ filter, handleFilterChange }) => {
 function App() {
   const [countries, setCountries] = useState([])
   const [filter, setFilter] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState(null)
 
   useEffect(() => {
     countryService
@@ -71,12 +75,19 @@ function App() {
 
   const handleFilterChange = event => {
     setFilter(event.target.value)
+    setSelectedCountry(null)
+  }
+
+  const handleSelectedCountry = country => {
+    setSelectedCountry(country)
   }
 
   return (
     <div>
       <FilterCountries filter={filter} handleFilterChange={handleFilterChange} />
-      <Countries countries={countries} filter={filter} DisplayCountry={DisplayCountry} />
+      <Countries countries={countries} filter={filter}
+      handleSelectedCountry={handleSelectedCountry} selectedCountry={selectedCountry} />
+      {selectedCountry && <DisplayCountry country={selectedCountry} />}
     </div>
   )
 }
