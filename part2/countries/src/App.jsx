@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react'
 import countryService from './services/countries'
 
 const Countries = ({ countries, filter }) => {
+  const filteredCountries = countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()) || filter === '')
+
+  if (filteredCountries.length > 10) {
+    return <p>Too many matches, specify another filter</p>
+  }
+
   return (
     <div>
-      {countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()) || filter === '')
-      .map(country => <p key={country.cca3}>{country.name.common}</p>)}
+      {filteredCountries.map(country => <p key={country.cca3}>{country.name.common}</p>)}
     </div>
   )
 }
