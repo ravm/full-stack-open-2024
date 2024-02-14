@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import countryService from './services/countries'
+import weatherService from './services/weather'
 
 const Countries = ({ countries, filter, handleSelectedCountry, selectedCountry }) => {
   if (selectedCountry) {
@@ -16,9 +17,9 @@ const Countries = ({ countries, filter, handleSelectedCountry, selectedCountry }
     return <p>Too many matches, specify another filter</p>
   } else if (filteredCountries.length > 1) {
     return (
-    <div>
-      {queriedCountries}
-    </div>
+      <div>
+        {queriedCountries}
+      </div>
     )
   } else if (filteredCountries.length === 1) {
     const country = filteredCountries[0];
@@ -31,6 +32,8 @@ const Countries = ({ countries, filter, handleSelectedCountry, selectedCountry }
 }
 
 const DisplayCountry = ({ country }) => {
+  const weather = weatherService.getWeather(country.capital)
+  console.log(weather)
   return (
     <div>
       <h1>{country.name.common}</h1>
@@ -45,6 +48,9 @@ const DisplayCountry = ({ country }) => {
           <picture>
             <img src={country.flags.svg} width={150} />
           </picture>
+          <div>
+            <h2>Weather in {country.capital}</h2>
+          </div>
     </div>
   )
 }
