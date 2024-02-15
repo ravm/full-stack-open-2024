@@ -23,17 +23,16 @@ const Countries = ({ countries, filter, handleSelectedCountry, selectedCountry }
     )
   } else if (filteredCountries.length === 1) {
     const country = filteredCountries[0];
-    return (
-      <div>
-        <DisplayCountry country={country} />
-      </div>
-    )
+    handleSelectedCountry(country)
+    return null
   }
 }
 
-const DisplayCountry = ({ country }) => {
-  const weather = weatherService.getWeather(country.capital)
-  console.log(weather)
+const DisplayCountry = ({ country, weather }) => {
+  if (!weather) {
+    return <p>Loading..</p>;
+  }
+  
   return (
     <div>
       <h1>{country.name.common}</h1>
@@ -50,6 +49,11 @@ const DisplayCountry = ({ country }) => {
           </picture>
           <div>
             <h2>Weather in {country.capital}</h2>
+            <p>temperature {weather.main.temp} Celcius </p>
+            <picture>
+              <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} />
+            </picture>
+            <p>wind {weather.wind.speed} m/s</p>
           </div>
     </div>
   )
@@ -67,6 +71,8 @@ function App() {
   const [countries, setCountries] = useState([])
   const [filter, setFilter] = useState('')
   const [selectedCountry, setSelectedCountry] = useState(null)
+  const [weather, setWeather] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     countryService
@@ -78,6 +84,22 @@ function App() {
         console.log(`Error fetching countries: ${err}`)
       })
   }, [])
+
+  useEffect(() => {
+    if (selectedCountry) {
+      setLoading(true)
+      weatherService
+        .getWeather(selectedCountry.capital)
+        .then(weatherData => {
+          setWeather(weatherData)
+          setLoading(false)
+        })
+        .catch(err => {
+          console.log(`Error fetching weather data: ${err}`)
+          setLoading(false)
+        })
+    }
+  }, [selectedCountry])
 
   const handleFilterChange = event => {
     setFilter(event.target.value)
@@ -91,9 +113,13 @@ function App() {
   return (
     <div>
       <FilterCountries filter={filter} handleFilterChange={handleFilterChange} />
-      <Countries countries={countries} filter={filter}
-      handleSelectedCountry={handleSelectedCountry} selectedCountry={selectedCountry} />
-      {selectedCountry && <DisplayCountry country={selectedCountry} />}
+      <Countries
+        countries={countries}
+        filter={filter}
+        handleSelectedCountry={handleSelectedCountry}
+        selectedCountry={selectedCountry}
+      />
+      {selectedCountry && (!loading ? <DisplayCountry country={selectedCountry} weather={weather} /> : <p>Loading..</p>)}
     </div>
   )
 }
