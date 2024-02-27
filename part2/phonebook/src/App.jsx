@@ -60,6 +60,11 @@ const App = () => {
     const nameExists = persons.find(person => person.name === newName);
     const numberExists = persons.find(person => person.number === newNumber);
 
+    if (!newNumber) {
+      alert('Number missing')
+      return;
+    }
+
     if (nameExists) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         const existingPerson = persons.find(person => person.name === newName);
