@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import personService from './services/persons'
 import './index.css'
 
-const FilterNames = ({ filter, handleFilterChange }) => {
+const FilterPersons = ({ filter, handleFilterChange }) => {
   return (
     <div>
       filter shown with <input value={filter} onChange={handleFilterChange} />
@@ -29,7 +29,8 @@ const PersonForm = ({ newName, handleNameChange, newNumber, handleNumberChange, 
 const Persons = ({ persons, filter, deletePerson }) => {
   return (
     <div>
-      {persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()) || filter === '')
+      {persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()) || 
+        person.number.includes(filter) || filter === '')
       .map(person => <p key={person.id}>{person.name} {person.number} <button key={person.id}
       onClick={() => deletePerson(person)}>delete</button></p>)}
     </div>
@@ -208,7 +209,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Notification message={message} type={messageType} />
       
-      <FilterNames filter={filter} handleFilterChange={handleFilterChange}/>
+      <FilterPersons filter={filter} handleFilterChange={handleFilterChange}/>
 
       <h3>add a new</h3>
       <PersonForm
