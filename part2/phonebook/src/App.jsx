@@ -60,8 +60,8 @@ const App = () => {
     const nameExists = persons.find(person => person.name === newName);
     const numberExists = persons.find(person => person.number === newNumber);
 
-    if (!newNumber) {
-      alert('Number missing')
+    if (!newName || !newNumber) {
+      alert('Name or number missing')
       return;
     }
 
@@ -81,16 +81,26 @@ const App = () => {
             setTimeout(() => {
               setMessage(null)
               setMessageType(null)
-            }, 2500)
+            }, 3000)
           })
           .catch(error => {
+            console.log('ENTIRE ERROR:', error)
+            console.log('error response data error:', error.response.data.error)
             console.log(`Error updating person: ${error}`)
-            setMessage(`Information of ${existingPerson.name} has already been removed from the server`)
+            if (error.response.data.error.includes('is shorter than the minimum allowed length (8).')) {
+              setMessage(`Error updating ${existingPerson.name}: Number too short.`)
+
+            } else if (error.response.data.error.includes('number: Validator failed for path')) {
+              setMessage(`Error updating ${existingPerson.name}: Invalid phone number.`)
+
+            } else {
+              setMessage(`Information of ${existingPerson.name} has already been removed from the server`)
+            }
             setMessageType('error')
             setTimeout(() => {
               setMessage(null)
               setMessageType(null)
-            }, 2500)
+            }, 4000)
           })
 
         return;
@@ -119,16 +129,29 @@ const App = () => {
         setTimeout(() => {
           setMessage(null)
           setMessageType(null)
-        }, 2500)
+        }, 3000)
       })
       .catch(error => {
+        console.log('ENTIRE ERROR:', error)
+        console.log('error response data error:', error.response.data.error)
         console.log(`Error creating person: ${error}`)
-        setMessage(`Error creating ${personObject.name}`)
+        if (error.response.data.error.includes('is shorter than the minimum allowed length (3).')) {
+          setMessage(`Error creating ${personObject.name}: Name too short.`)
+
+        } else if (error.response.data.error.includes('is shorter than the minimum allowed length (8).')) {
+          setMessage(`Error creating ${personObject.name}: Number too short.`)
+
+        } else if (error.response.data.error.includes('number: Validator failed for path')) {
+          setMessage(`Error creating ${personObject.name}: Invalid phone number.`)
+          
+        } else {
+          setMessage(`Error creating ${personObject.name}: ${error.response.data.error}`)
+        }
         setMessageType('error')
         setTimeout(() => {
           setMessage(null)
           setMessageType(null)
-        }, 2500)
+        }, 4000)
       })
   }
 
@@ -143,7 +166,7 @@ const App = () => {
         setTimeout(() => {
           setMessage(null)
           setMessageType(null)
-        }, 2500)
+        }, 3000)
       })
       .catch(error => {
         console.log(`Error deleting person: ${error}`)
@@ -152,7 +175,7 @@ const App = () => {
         setTimeout(() => {
           setMessage(null)
           setMessageType(null)
-        }, 2500)
+        }, 4000)
       })
     } 
   }
