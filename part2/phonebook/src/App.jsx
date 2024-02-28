@@ -71,6 +71,11 @@ const App = () => {
         const existingPerson = persons.find(person => person.name === newName);
         const updatedPerson = {...existingPerson, number: newNumber};
 
+        if (numberExists) {
+          alert(`${newNumber} is already added to phonebook`)
+          return;
+        }
+
         personService
           .update(existingPerson.id, updatedPerson)
           .then(returnedPerson => {
