@@ -34,7 +34,15 @@ const listWithManyBlogs = [
     url: "https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf",
     likes: 5,
     __v: 0,
-  }
+  },
+  {
+    _id: "5a422aa71b54a676234d17f0",
+    title: "The Graveyard Book",
+    author: "Neil Gaiman",
+    url: "https://www.goodreads.com/book/show/2213661.The_Graveyard_Book",
+    likes: 0,
+    __v: 0,
+  },
 ];
 
 test("dummy returns one", () => {
@@ -82,6 +90,19 @@ describe("favorite blog", () => {
         title: "A Boy and His Dog at the End of the World",
         author: "C. a. Fletcher",
         likes: 7,
+      }
+    );
+  });
+});
+
+describe("most blogs", () => {
+  test("author with the most blogs", () => {
+    const result = listHelper.mostBlogs(listWithManyBlogs);
+    assert.deepStrictEqual(
+      result,
+      {
+        author: "Neil Gaiman",
+        blogs: 2,
       }
     );
   });
