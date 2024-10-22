@@ -107,3 +107,16 @@ describe("most blogs", () => {
     );
   });
 });
+
+describe("most likes", () => {
+  test("author with most likes", () => {
+    const result = listHelper.mostLikes(listWithManyBlogs);
+    assert.deepStrictEqual(
+      result,
+      {
+        author: "C. a. Fletcher",
+        likes: 7
+      }
+    );
+  });
+});
