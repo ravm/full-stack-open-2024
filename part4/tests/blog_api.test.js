@@ -15,6 +15,12 @@ test("application contains one blog that is returned as json", async () => {
   assert.strictEqual(response.body.length, 1);
 });
 
+test("verify unique identifier of blog posts", async () => {
+  const response = await api.get("/api/blogs");
+  const blog = response.body[0];
+  assert.strictEqual(blog.hasOwnProperty("id"), true);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
