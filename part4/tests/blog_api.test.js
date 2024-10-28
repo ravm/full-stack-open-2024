@@ -1,10 +1,17 @@
-const { test, after } = require("node:test");
+const { test, after, beforeEach } = require("node:test");
 const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
+const helper = require("./test_helper");
 const app = require("../app");
-
 const api = supertest(app);
+const Blog = require("../models/blog");
+
+beforeEach(async () => {
+  await Blog.deleteMany({});
+  const blogObject = new Blog(helper.initialBlogs[0]);
+  await blogObject.save();
+});
 
 test("application contains one blog that is returned as json", async () => {
   const response = await api
@@ -31,11 +38,10 @@ test("verify successful blog post creation", async () => {
     likes: 1,
   };
 
-  const response = await api
+  await api
     .post("/api/blogs")
-    .send(blog);
-
-  assert.strictEqual(response.status, 201);
+    .send(blog)
+    .expect(201);
   
   const numberOfBlogsAfterPost = (await api.get("/api/blogs")).body.length;
   assert.strictEqual(numberOfBlogsAfterPost > numberOfBlogsBeforePost, true)
