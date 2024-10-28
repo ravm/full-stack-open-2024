@@ -9,17 +9,16 @@ const Blog = require("../models/blog");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  const blogObject = new Blog(helper.initialBlogs[0]);
-  await blogObject.save();
+  await Blog.insertMany(helper.initialBlogs);
 });
 
-test("application contains one blog that is returned as json", async () => {
+test("application contains initial blogs that are returned as json", async () => {
   const response = await api
     .get("/api/blogs")
     .expect(200)
     .expect("Content-Type", /application\/json/);
 
-  assert.strictEqual(response.body.length, 1);
+  assert.strictEqual(response.body.length, helper.initialBlogs.length);
 });
 
 test("verify unique identifier of blog posts", async () => {
@@ -29,7 +28,7 @@ test("verify unique identifier of blog posts", async () => {
 });
 
 test("verify successful blog post creation", async () => {
-  const numberOfBlogsBeforePost = (await api.get("/api/blogs")).body.length;
+  const numberOfBlogsBeforePost = (await helper.blogsInDb()).length;
   
   const blog = {
     title: "test POST blog",
@@ -43,8 +42,8 @@ test("verify successful blog post creation", async () => {
     .send(blog)
     .expect(201);
   
-  const numberOfBlogsAfterPost = (await api.get("/api/blogs")).body.length;
-  assert.strictEqual(numberOfBlogsAfterPost > numberOfBlogsBeforePost, true)
+  const numberOfBlogsAfterPost = (await helper.blogsInDb()).length;
+  assert.strictEqual(numberOfBlogsAfterPost, numberOfBlogsBeforePost + 1);
 });
 
 test("blog post creation without likes will default to 0", async () => {
@@ -60,6 +59,18 @@ test("blog post creation without likes will default to 0", async () => {
     .expect(201);
 
   assert.strictEqual(response.body.likes, 0);
+});
+
+test("blog post creation without title or url -> bad request", async () => {
+  const blog = {
+    author: "supertest",
+    likes: 2,
+  };
+  
+  await api
+    .post("/api/blogs")
+    .send(blog)
+    .expect(400);
 });
 
 after(async () => {
