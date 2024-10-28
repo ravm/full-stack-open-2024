@@ -5,7 +5,7 @@ const initialBlogs = [
     title: "initial blog",
     author: "initialization",
     url: "http://localhost:3003/api/blogs",
-    likes: 0,
+    likes: 5,
   },
 ];
 

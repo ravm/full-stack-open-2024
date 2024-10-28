@@ -47,6 +47,21 @@ test("verify successful blog post creation", async () => {
   assert.strictEqual(numberOfBlogsAfterPost > numberOfBlogsBeforePost, true)
 });
 
+test("blog post creation without likes will default to 0", async () => {
+  const blog = {
+    title: "test blog without likes",
+    author: "supertest",
+    url: "http://localhost:3003/api/blogs",
+  };
+
+  const response = await api
+    .post("/api/blogs")
+    .send(blog)
+    .expect(201);
+
+  assert.strictEqual(response.body.likes, 0);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
