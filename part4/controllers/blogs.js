@@ -8,6 +8,7 @@ blogsRouter.get("/", async (req, res) => {
 
 blogsRouter.post("/", async (req, res) => {
   const blog = new Blog(req.body);
+
   if (!blog.title || !blog.url) {
     res.status(400).end();
   } else {
@@ -29,7 +30,7 @@ blogsRouter.put("/:id", async(req, res) => {
     author,
     url,
     likes,
-  };
+  }
 
   await Blog.findByIdAndUpdate(req.params.id, updatedBlog);
   res.status(200).end();

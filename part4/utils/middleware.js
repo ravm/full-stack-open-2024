@@ -6,11 +6,11 @@ const requestLogger = (req, res, next) => {
   logger.info("Body:", req.body);
   logger.info("---");
   next();
-};
+}
 
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: "unknown endpoint" });
-};
+}
 
 const errorHandler = (err, req, res, next) => {
   logger.error(err.message);
@@ -18,12 +18,14 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).send({ error: "malformatted ID" });
   } else if (err.name == "ValidationError") {
     return res.status(400).json({ error: err.message });
-  };
+  } else if (err.name === "MongoServerError" && err.code === 11000) {
+    return res.status(400).json({ error: "expected `username` to be unique" });
+  } else if (err.name === "")
   next(err);
-};
+}
 
 module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
-};
+}
