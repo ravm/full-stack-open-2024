@@ -3,21 +3,43 @@ const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const helper = require("./test_helper");
 const app = require("../app");
 const api = supertest(app);
 const Blog = require("../models/blog");
 const User = require("../models/user");
 
-describe("blog tests", () => {
+let token;
+
   beforeEach(async () => {
     await Blog.deleteMany({});
-    await Blog.insertMany(helper.initialBlogs);
+    await User.deleteMany({});
+
+  const passwordHash = await bcrypt.hash("sekret", 10);
+  const user = new User({ username: "root", passwordHash });
+  await user.save();
+
+  const userForToken = {
+    username: user.username,
+    id: user._id,
+  }
+
+  token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60 * 60 });
+
+  const blogsWithUser = helper.initialBlogs.map(blog => ({
+    ...blog,
+    user: user.id,
+  }));
+
+  await Blog.insertMany(blogsWithUser);
   });
 
+describe("blog tests", () => {
   test("application contains initial blogs that are returned as json", async () => {
     const response = await api
       .get("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .expect(200)
       .expect("Content-Type", /application\/json/)
   
@@ -25,83 +47,101 @@ describe("blog tests", () => {
   });
   
   test("verify unique identifier of blog posts", async () => {
-    const response = await api.get("/api/blogs");
+    const response = await api
+      .get("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
+      .expect(200)
+      .expect("Content-Type", /application\/json/)
+
     const blog = response.body[0];
     assert.strictEqual(blog.hasOwnProperty("id"), true);
   });
   
   test("verify successful blog post creation", async () => {
     const numberOfBlogsBeforePost = (await helper.blogsInDb()).length;
-    
+
     const blog = {
       title: "test POST blog",
       author: "supertest",
       url: "http://localhost:3003/api/blogs",
       likes: 1,
-    };
-  
+    }
     await api
       .post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .send(blog)
       .expect(201)
       .expect("Content-Type", /application\/json/)
-    
+
     const numberOfBlogsAfterPost = (await helper.blogsInDb()).length;
     assert.strictEqual(numberOfBlogsAfterPost, numberOfBlogsBeforePost + 1);
   });
-  
+
   test("blog post creation without likes will default to 0", async () => {
     const blog = {
       title: "test blog without likes",
       author: "supertest",
       url: "http://localhost:3003/api/blogs",
-    };
-  
+    }
     const response = await api
       .post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .send(blog)
       .expect(201)
       .expect("Content-Type", /application\/json/)
-  
+
     assert.strictEqual(response.body.likes, 0);
   });
-  
+
   test("blog post creation without title or url -> bad request", async () => {
     const blog = {
       author: "supertest",
       likes: 2,
-    };
-    
+    }
     await api
       .post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .send(blog)
       .expect(400)
   });
-  
+
+  test("blog post creation without token fails with 401 unauthorized", async () => {
+    const blog = {
+      title: "test blog without token",
+      author: "supertest",
+      url: "http://localhost:3003/api/blogs",
+    }
+    await api
+      .post("/api/blogs")
+      .send(blog)
+      .expect(401)
+  });
+
   test("update a single blog post", async () => {
     const blogsBeforeUpdate = await helper.blogsInDb();
     const blogId = blogsBeforeUpdate[0].id;
-  
-    const updatedBlog = {...blogsBeforeUpdate[0]};
+
+    const updatedBlog = { ...blogsBeforeUpdate[0] };
     updatedBlog.likes = 999;
-  
+
     await api
       .put(`/api/blogs/${blogId}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(updatedBlog)
       .expect(200)
-  
+
     const blogsAfterUpdate = await helper.blogsInDb();
     assert.strictEqual(blogsAfterUpdate[0].likes === blogsBeforeUpdate[0].likes, false);
   });
-  
+
   test("delete a single blog post", async () => {
     const blogs = await helper.blogsInDb();
     const blogId = blogs[0].id;
-  
     await api
       .delete(`/api/blogs/${blogId}`)
+      .set("Authorization", `Bearer ${token}`)
       .expect(204)
-    
+
     const numberOfBlogsAfterDelete = (await helper.blogsInDb()).length;
     assert.strictEqual(numberOfBlogsAfterDelete < blogs.length, true);
   });
@@ -123,7 +163,6 @@ describe("user tests", () => {
       name: "Miika Ravi",
       password: "password",
     }
-
     await api
       .post("/api/users")
       .send(newUser)
@@ -144,7 +183,6 @@ describe("user tests", () => {
       name: "SuperUser",
       password: "root",
     }
-
     const result = await api
       .post("/api/users")
       .send(newUser)
@@ -162,7 +200,6 @@ describe("user tests", () => {
       name: "Test Guy",
       password: "root",
     }
-
     const result = await api
       .post("/api/users")
       .send(newUser)
@@ -180,7 +217,6 @@ describe("user tests", () => {
       username: "nopw",
       name: "Test Guy",
     }
-
     const result = await api
       .post("/api/users")
       .send(newUser)
@@ -199,7 +235,6 @@ describe("user tests", () => {
       name: "Test Guy",
       password: "root",
     }
-
     const result = await api
       .post("/api/users")
       .send(newUser)
@@ -218,7 +253,6 @@ describe("user tests", () => {
       name: "Test Guy",
       password: "tg",
     }
-
     const result = await api
       .post("/api/users")
       .send(newUser)
