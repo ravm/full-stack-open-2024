@@ -70,6 +70,23 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (blogObject) => {
+    try {
+      if (window.confirm(`Delete ${blogObject.title} by ${blogObject.author}?`)) {
+        await blogService.deleteBlog(blogObject);
+        setBlogs(blogs.filter(blog => blog.id !== blogObject.id));
+        setMessageType("success");
+        setMessage(`${blogObject.title} by ${blogObject.author} deleted`);
+        setTimeout(() => {
+          setMessage(null);
+          setMessageType(null);
+        }, 4000);
+      }
+    } catch (exception) {
+      console.log(exception);
+    }
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
@@ -139,7 +156,7 @@ const App = () => {
             <BlogForm createBlog={addBlog} />
           </Togglable>
           {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
-            <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
+            <Blog key={blog.id} blog={blog} likeBlog={likeBlog} deleteBlog={deleteBlog} />
           ))}
         </div> 
       }
