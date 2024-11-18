@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
@@ -14,6 +14,8 @@ const App = () => {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
+  const blogFormRef = useRef();
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -40,6 +42,7 @@ const App = () => {
   }, []);
 
   const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility();
     try {
       const createdBlog = await blogService.create(blogObject);
       setBlogs(blogs.concat(createdBlog));
@@ -119,7 +122,7 @@ const App = () => {
           <h1>Blogs</h1>
           <h4>Logged in as {user.username} <button onClick={logOut}>Log out</button></h4>
           <Notification message={message} type={messageType} />
-          <Togglable buttonLabel="New blog">
+          <Togglable buttonLabelOpen="Create new blog" buttonLabelClose="Close" ref={blogFormRef}>
             <BlogForm createBlog={addBlog} />
           </Togglable>
           {blogs.map(blog => (
