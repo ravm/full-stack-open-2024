@@ -49,10 +49,11 @@ blogsRouter.put("/:id", async(req, res) => {
     author,
     url,
     likes,
+    user: req.user,
   }
 
-  await Blog.findByIdAndUpdate(req.params.id, updatedBlog);
-  res.status(200).end();
+  const updatedBlogRes = await Blog.findByIdAndUpdate(req.params.id, updatedBlog, { new: true }).populate("user", { username: 1, name: 1 });
+  res.status(200).json(updatedBlogRes);
 });
 
 module.exports = blogsRouter;
