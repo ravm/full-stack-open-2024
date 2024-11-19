@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const Blog = ({ blog, likeBlog, deleteBlog }) => {
   const [blogDetailsVisible, setBlogDetailsVisible] = useState(false);
@@ -8,12 +9,12 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
     paddingLeft: 2,
     border: "solid",
     borderWidth: 1,
-    marginBottom: 5
-  }
+    marginBottom: 5,
+  };
 
   const toggleVisibility = () => {
     setBlogDetailsVisible(!blogDetailsVisible);
-  }
+  };
 
   return (
     <div style={blogStyle}>
@@ -29,10 +30,26 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
           <div>
             <button onClick={() => deleteBlog(blog)}>Delete</button>
           </div>
-      </div>
+        </div>
       )}
     </div>
   );
-}
+};
+
+Blog.propTypes = {
+  blog: PropTypes.shape({
+    author: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    likes: PropTypes.number,
+    title: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      username: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+  likeBlog: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
+};
 
 export default Blog;
