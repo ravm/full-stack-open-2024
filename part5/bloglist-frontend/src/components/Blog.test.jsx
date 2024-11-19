@@ -15,6 +15,7 @@ test("renders only blog's title and author", () => {
       username: "testUser",
     },
   };
+
   render(<Blog blog={blog} likeBlog={vi.fn()} deleteBlog={vi.fn()} />);
 
   const titleAndAuthorElement = screen.getByText("Content render test by React library");
@@ -51,4 +52,32 @@ test("blog's url and likes are shown when clicking 'Show'", async () => {
 
   expect(urlElement).toBeDefined();
   expect(likesElement).toBeDefined();
+});
+
+test("like button is clicked twice", async () => {
+  const blog = {
+    author: "React library",
+    id: "123",
+    likes: 0,
+    title: "Like button is clicked twice",
+    url: "www.test.com",
+    user: {
+      id: "321",
+      username: "testUser",
+    },
+  };
+
+  const mockHandler = vi.fn();
+
+  render(<Blog blog={blog} likeBlog={mockHandler} deleteBlog={vi.fn()} />);
+
+  const user = userEvent.setup();
+  
+  const showButton = screen.getByText("Show");
+  await user.click(showButton);
+
+  const likeButton = screen.getByText("Like");
+  for (let i = 0; i < 2; i++) await user.click(likeButton);
+
+  expect(mockHandler.mock.calls).toHaveLength(2);
 });
