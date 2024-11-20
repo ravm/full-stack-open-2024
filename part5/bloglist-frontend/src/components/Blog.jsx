@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const Blog = ({ blog, likeBlog, deleteBlog }) => {
+const Blog = ({ blog, likeBlog, deleteBlog, loggedUser }) => {
   const [blogDetailsVisible, setBlogDetailsVisible] = useState(false);
 
   const blogStyle = {
@@ -17,7 +17,7 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} data-testid="blog">
       <div>
         {blog.title} by {blog.author}
         <button onClick={toggleVisibility}>{blogDetailsVisible ? "Hide" : "Show"}</button>
@@ -27,9 +27,11 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
           <p>{blog.url}</p>
           <p>Likes: {blog.likes} <button onClick={() => likeBlog(blog)}>Like</button></p>
           <p>User: {blog.user.username}</p>
-          <div>
-            <button onClick={() => deleteBlog(blog)}>Delete</button>
-          </div>
+          { blog.user.username === loggedUser.username && (
+            <div>
+              <button onClick={() => deleteBlog(blog)}>Delete</button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -50,6 +52,11 @@ Blog.propTypes = {
   }).isRequired,
   likeBlog: PropTypes.func.isRequired,
   deleteBlog: PropTypes.func.isRequired,
+  loggedUser: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    token: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default Blog;
