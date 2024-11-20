@@ -23,10 +23,9 @@ const App = () => {
       if (user) {
         try {
           const allBlogs = await blogService.getAll(user.token);
-          const userBlogs = allBlogs.filter(blog => blog.user && blog.user.username === user.username);
-          setBlogs(userBlogs);
-        } catch (error) {
-          console.log(error);
+          setBlogs(allBlogs);
+        } catch (exception) {
+          console.log(exception);
         }
       }
     };
@@ -133,7 +132,13 @@ const App = () => {
             <BlogForm createBlog={addBlog} />
           </Togglable>
           {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
-            <Blog key={blog.id} blog={blog} likeBlog={likeBlog} deleteBlog={deleteBlog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              likeBlog={likeBlog}
+              deleteBlog={deleteBlog}
+              loggedUser={user} 
+            />
           ))}
         </div>
       }
