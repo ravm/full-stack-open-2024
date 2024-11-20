@@ -1,8 +1,9 @@
 import { test, expect, describe, beforeEach } from "@playwright/test";
+import { loginWith } from "./helper";
 
 const userdata = {
-  name: "Tim Tester",
-  username: "timtest",
+  name: "Playwright Test",
+  username: "test",
   password: "123",
 };
 
@@ -26,20 +27,32 @@ describe("Blog app", () => {
 
   describe("Login", () => {
     test("login succeeds with correct credentials", async ({ page }) => {
-      page.getByTestId("username").fill(userdata.username);
-      page.getByTestId("password").fill(userdata.password);
-      await page.getByRole("button", { name: "Login" }).click();
-
+      await loginWith(page, userdata.username, userdata.password);
       await expect(page.getByText(`Logged in as ${userdata.username}`)).toBeVisible();
     });
 
     test("login fails with incorrect credentials", async ({ page }) => {
-      page.getByTestId("username").fill(userdata.name);
-      page.getByTestId("password").fill("wrongpassword");
-      await page.getByRole("button", { name: "Login" }).click();
-
+      await loginWith(page, userdata.username, "wrongpassword");
       const errorDiv = page.locator(".error")
       await expect(errorDiv).toContainText("Wrong username or password");
+    });
+  });
+  
+  describe("When logged in", () => {
+    beforeEach(async ({ page }) => {
+      await loginWith(page, userdata.username, userdata.password);
+      await expect(page.getByText(`Logged in as ${userdata.username}`)).toBeVisible();
+    });
+
+    test("user can create a blog", async ({ page }) => {
+      await page.getByRole("button", { name: "Create new blog" }).click();
+      await page.getByTestId("title").fill("Playwright test blog");
+      await page.getByTestId("author").fill("Playwright test author");
+      await page.getByTestId("url").fill("www.playwright.com");
+      await page.getByRole("button", { name: "Create" }).click();
+
+      const successDiv = page.locator(".success");
+      await expect(successDiv).toContainText("Playwright test blog added");
     });
   });
 });
