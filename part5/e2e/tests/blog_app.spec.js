@@ -1,10 +1,16 @@
 import { test, expect, describe, beforeEach } from "@playwright/test";
-import { loginWith } from "./helper";
+import { loginWith, createBlog } from "./helper";
 
 const userdata = {
   name: "Playwright Test",
   username: "test",
   password: "123",
+};
+
+const blogData = {
+  title: "Playwright test blog",
+  author: "Playwright test author",
+  url: "www.playwright.com",
 };
 
 describe("Blog app", () => {
@@ -45,14 +51,29 @@ describe("Blog app", () => {
     });
 
     test("user can create a blog", async ({ page }) => {
-      await page.getByRole("button", { name: "Create new blog" }).click();
-      await page.getByTestId("title").fill("Playwright test blog");
-      await page.getByTestId("author").fill("Playwright test author");
-      await page.getByTestId("url").fill("www.playwright.com");
-      await page.getByRole("button", { name: "Create" }).click();
-
+      await createBlog(
+        page,
+        blogData.title,
+        blogData.author,
+        blogData.url,
+      );
       const successDiv = page.locator(".success");
-      await expect(successDiv).toContainText("Playwright test blog added");
+      await expect(successDiv).toContainText(`${blogData.title} added`);
+    });
+
+    test("blog can be liked", async ({ page }) => {
+      await createBlog(
+        page,
+        blogData.title,
+        blogData.author,
+        blogData.url,
+      );
+      const successDiv = page.locator(".success");
+      await expect(successDiv).toContainText(`${blogData.title} added`);
+
+      await page.getByRole("button", { name: "Show" }).click();
+      await page.getByRole("button", { name: "Like" }).click();
+      await expect(page.getByText("Likes: 1")).toBeVisible();
     });
   });
 });
