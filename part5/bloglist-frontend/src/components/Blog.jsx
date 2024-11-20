@@ -17,7 +17,7 @@ const Blog = ({ blog, likeBlog, deleteBlog, loggedUser }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} data-testid="blog">
       <div>
         {blog.title} by {blog.author}
         <button onClick={toggleVisibility}>{blogDetailsVisible ? "Hide" : "Show"}</button>
