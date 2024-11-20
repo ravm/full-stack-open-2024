@@ -61,19 +61,33 @@ describe("Blog app", () => {
       await expect(successDiv).toContainText(`${blogData.title} added`);
     });
 
-    test("blog can be liked", async ({ page }) => {
-      await createBlog(
-        page,
-        blogData.title,
-        blogData.author,
-        blogData.url,
-      );
-      const successDiv = page.locator(".success");
-      await expect(successDiv).toContainText(`${blogData.title} added`);
+    describe("Blog exists", () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(
+          page,
+          blogData.title,
+          blogData.author,
+          blogData.url,
+        );
+        const successDiv = page.locator(".success");
+        await expect(successDiv).toContainText(`${blogData.title} added`);
+      });
 
-      await page.getByRole("button", { name: "Show" }).click();
-      await page.getByRole("button", { name: "Like" }).click();
-      await expect(page.getByText("Likes: 1")).toBeVisible();
+      test("blog can be liked", async ({ page }) => {
+        await page.getByRole("button", { name: "Show" }).click();
+        await page.getByRole("button", { name: "Like" }).click();
+        await expect(page.getByText("Likes: 1")).toBeVisible();
+      });
+
+      test("blog can be deleted", async ({ page }) => {
+        page.on("dialog", async dialog => {
+          await dialog.accept();
+        });
+
+        await page.getByRole("button", { name: "Show" }).click();
+        await page.getByRole("button", { name: "Delete" }).click();
+        await expect(page.getByText(`${blogData.title} by ${blogData.author}`)).not.toBeVisible();
+      });
     });
   });
 });
