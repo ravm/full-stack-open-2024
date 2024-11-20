@@ -55,6 +55,7 @@ Blog.propTypes = {
   loggedUser: PropTypes.shape({
     name: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
+    token: PropTypes.string.isRequired,
   }).isRequired,
 };
 
