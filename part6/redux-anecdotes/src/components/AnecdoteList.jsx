@@ -26,7 +26,7 @@ const AnecdoteList = () => {
 
   return(
     <ul>
-      {anecdotes.sort((a, b) => b.votes - a.votes).map(anecdote =>
+      {anecdotes.slice().sort((a, b) => b.votes - a.votes).map(anecdote =>
         <Anecdote 
           key={anecdote.id}
           anecdote={anecdote}
